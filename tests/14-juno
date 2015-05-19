@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+
+import amulet
+import requests
+import unittest
+
+class TestDeployment(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.deployment = amulet.Deployment(series='trusty')
+        cls.deployment.load_bundle_file(bundle_file='files/plumgrid-edge.yaml', deployment_name='test')
+        try:
+            cls.deployment.setup(timeout=2000)
+            cls.deployment.sentry.wait()
+        except amulet.helpers.TimeoutError:
+            amulet.raise_status(amulet.SKIP, msg="Environment wasn't stood up in time")
+        except:
+            raise
+       
+    def test_plumgrid_edge_started(self):
+        agent_state = self.deployment.sentry['plumgrid-edge/0'].info['agent-state']
+        if agent_state != 'started':
+            amulet.raise_status(amulet.FAIL, msg='plumgrid edge is not in a started state')
+
+    def test_plumgrid_edge_relation(self):
+        relation = self.deployment.sentry['plumgrid-edge/0'].relation('plumgrid-plugin', 'neutron-iovisor:plumgrid-plugin')
+        if not relation['private-address']:
+            amulet.raise_status(amulet.FAIL, msg='private address was not set in the plumgrid edge relation')
+
+if __name__ == '__main__':
+    unittest.main()
