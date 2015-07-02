@@ -1,18 +1,12 @@
 name: plumgrid-edge
 subordinate: false
 maintainer: Bilal Baqar <bbaqar@plumgrid.com>
-summary: "OpenStack Neutron OpenvSwitch Agent"
+summary: "PLUMgrid IO Visor Edge"
 description: |
-  Neutron is a virtual network service for Openstack, and a part of
-  Netstack. Just like OpenStack Nova provides an API to dynamically
-  request and configure virtual servers, Neutron provides an API to
-  dynamically request and configure virtual networks. These networks
-  connect "interfaces" from other OpenStack services (e.g., virtual NICs
-  from Nova VMs). The Neutron API supports extensions to provide
-  advanced network capabilities (e.g., QoS, ACLs, network monitoring,
-  etc.)
-  .
-  This charm provides the Plumgrid Edge.
+  A PLUMgrid Edge is an OpenStack compute node running IO Visor. IO Visor
+  provides the data plane and network connectivity for OpenStack tenant
+  instances. Communication between instances on compute nodes is enabled
+  by creation of VXLAN based overlay tunnels and networks.
 tags:
   - openstack
 requires:
@@ -20,5 +14,3 @@ requires:
     interface: plumgrid-plugin
   plumgrid:
     interface: plumgrid
-  neutron-plugin-api:
-    interface: neutron-plugin-api
