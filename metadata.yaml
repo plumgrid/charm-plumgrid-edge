@@ -1,5 +1,5 @@
 name: plumgrid-edge
-subordinate: false
+subordinate: true
 maintainer: Bilal Baqar <bbaqar@plumgrid.com>
 summary: "PLUMgrid IO Visor Edge"
 description: |
@@ -9,8 +9,13 @@ description: |
   by creation of VXLAN based overlay tunnels and networks.
 tags:
   - openstack
+provides:
+  neutron-plugin:
+    interface: neutron-plugin
+    scope: container
 requires:
-  plumgrid-plugin:
-    interface: plumgrid-plugin
   plumgrid:
     interface: plumgrid
+  container:
+    interface: juju-info
+    scope: container
