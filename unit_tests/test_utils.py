@@ -50,7 +50,7 @@ class CharmTestCase(unittest.TestCase):
         super(CharmTestCase, self).setUp()
         self.patches = patches
         self.obj = obj
-        #self.test_config = TestConfig()
+        self.test_config = TestConfig()
         self.test_relation = TestRelation()
         self.patch_all()
 

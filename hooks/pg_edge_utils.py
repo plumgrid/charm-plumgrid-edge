@@ -27,6 +27,7 @@ import subprocess
 import time
 import os
 
+SHARED_SECRET = "/etc/nova/secret.txt"
 LXC_CONF = '/etc/libvirt/lxc.conf'
 TEMPLATES = 'templates/'
 PG_LXC_DATA_PATH = '/var/lib/libvirt/filesystems/plumgrid-data'

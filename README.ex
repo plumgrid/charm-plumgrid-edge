@@ -17,9 +17,9 @@ Step by step instructions on using the charm:
     juju deploy plumgrid-edge
 
     juju add-relation neutron-api neutron-api-plumgrid
-    juju add-relation neutron-api-plumgrid plumgrid-director
     juju add-relation plumgrid-director plumgrid-edge
     juju add-relation nova-compute plumgrid-edge
+    juju add-relation neutron-api-plumgrid plumgrid-edge
 
 For plumgrid-edge to work make the configuration in the neutron-api, neutron-api-plumgrid and plumgrid-director charms as specified in the configuration section below.
 

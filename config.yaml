@@ -15,3 +15,7 @@ options:
     default: null
     type: string
     description: Provide the respective keys of the install sources
+  metadata-shared-key:
+    default: 'plumgrid'
+    type: string
+    description: Provide a key to be used as the metadata shared key

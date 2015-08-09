@@ -16,6 +16,8 @@ provides:
 requires:
   plumgrid:
     interface: plumgrid
+  plumgrid-plugin:
+    interface: plumgrid-plugin
   container:
     interface: juju-info
     scope: container

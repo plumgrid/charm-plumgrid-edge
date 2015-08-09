@@ -11,6 +11,9 @@ from charmhelpers.core.hookenv import (
     Hooks,
     UnregisteredHookError,
     log,
+    relation_set,
+    relation_ids,
+    config,
 )
 
 from charmhelpers.fetch import (
@@ -63,6 +66,15 @@ def plumgrid_joined():
     restart_pg()
 
 
+@hooks.hook('neutron-plugin-relation-joined')
+@hooks.hook('plumgrid-plugin-relation-joined')
+def neutron_plugin_joined(relation_id=None):
+    rel_data = {
+        'metadata-shared-secret': config('metadata-shared-key'),
+    }
+    relation_set(relation_id=relation_id, **rel_data)
+
+
 @hooks.hook('config-changed')
 def config_changed():
     '''
@@ -76,6 +88,10 @@ def config_changed():
         apt_install(pkg, options=['--force-yes'], fatal=True)
     load_iovisor()
     ensure_mtu()
+    for rid in relation_ids('neutron-plugin'):
+        neutron_plugin_joined(rid)
+    for rid in relation_ids('plumgrid-plugin'):
+        neutron_plugin_joined(rid)
     ensure_files()
     add_lcm_key()
     CONFIGS.write_all()

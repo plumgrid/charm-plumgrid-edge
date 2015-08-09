@@ -29,6 +29,9 @@ TO_PATCH = [
     'ensure_mtu',
     'add_lcm_key',
     'determine_packages',
+    'config',
+    'relation_set',
+    'relation_ids',
 ]
 NEUTRON_CONF_DIR = "/etc/neutron"
 
@@ -39,7 +42,7 @@ class PGEdgeHooksTests(CharmTestCase):
 
     def setUp(self):
         super(PGEdgeHooksTests, self).setUp(hooks, TO_PATCH)
-        #self.config.side_effect = self.test_config.get
+        self.config.side_effect = self.test_config.get
         hooks.hooks._config_save = False
 
     def _call_hook(self, hookname):
@@ -53,8 +56,7 @@ class PGEdgeHooksTests(CharmTestCase):
         self.configure_sources.assert_called_with(update=True)
         self.apt_install.assert_has_calls([
             call(_pkgs, fatal=True,
-                 options=['--force-yes',
-                          '--option=Dpkg::Options::=--force-confold']),
+                 options=['--force-yes']),
         ])
         self.load_iovisor.assert_called_with()
         self.ensure_mtu.assert_called_with()
@@ -69,6 +71,17 @@ class PGEdgeHooksTests(CharmTestCase):
         self.CONFIGS.write_all.assert_called_with()
         self.restart_pg.assert_called_with()
 
+    def test_neutron_plugin_joined(self):
+        self.test_config.set('metadata-shared-key', 'plumgrid')
+        self._call_hook('neutron-plugin-relation-joined')
+        rel_data = {
+            'metadata-shared-secret': 'plumgrid',
+        }
+        self.relation_set.assert_called_with(
+            relation_id=None,
+            **rel_data
+        )
+
     def test_config_changed_hook(self):
         _pkgs = ['plumgrid-lxc', 'iovisor-dkms']
         self.determine_packages.return_value = [_pkgs]
@@ -77,8 +90,7 @@ class PGEdgeHooksTests(CharmTestCase):
         self.configure_sources.assert_called_with(update=True)
         self.apt_install.assert_has_calls([
             call(_pkgs, fatal=True,
-                 options=['--force-yes',
-                          '--option=Dpkg::Options::=--force-confold']),
+                 options=['--force-yes']),
         ])
         self.load_iovisor.assert_called_with()
         self.ensure_mtu.assert_called_with()
