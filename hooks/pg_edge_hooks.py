@@ -54,10 +54,11 @@ def install():
 
 
 @hooks.hook('plumgrid-relation-joined')
-def plumgrid_joined():
+@hooks.hook('plumgrid-relation-changed')
+def director_joined():
     '''
     This hook is run when relation between plumgrid-edge and
-    plumgrid-director is made.
+    plumgrid-director is made or changed.
     '''
     ensure_mtu()
     ensure_files()
@@ -69,6 +70,10 @@ def plumgrid_joined():
 @hooks.hook('neutron-plugin-relation-joined')
 @hooks.hook('plumgrid-plugin-relation-joined')
 def neutron_plugin_joined(relation_id=None):
+    '''
+    This hook updates the metadata shared key in neutron-api-plumgrid
+    and nova-compute.
+    '''
     rel_data = {
         'metadata-shared-secret': config('metadata-shared-key'),
     }

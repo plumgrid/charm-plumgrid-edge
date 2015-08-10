@@ -41,7 +41,7 @@ Example Config
     neutron-api-plumgrid:
         install_sources: 'ppa:plumgrid-team/stable'
         install_keys: 'null'
-        enable-metadata: False
+        enable-metadata: True
     neutron-api:
         neutron-plugin: "plumgrid"
         plumgrid-virtual-ip: "192.168.100.250"

@@ -158,12 +158,13 @@ def check_interface_type():
     log("Checking Interface Type")
     default_interface = "juju-br0"
     AWS_interface = "eth0"
-    shell_output = subprocess.check_output(['brctl','show','juju-br0'])
-    output = re.split(' |\n|\t',shell_output)
+    shell_output = subprocess.check_output(['brctl', 'show', 'juju-br0'])
+    output = re.split(' |\n|\t', shell_output)
     if output[10] == '':
         return AWS_interface
     else:
         return default_interface
+
 
 def ensure_mtu():
     '''
