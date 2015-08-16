@@ -86,6 +86,9 @@ def config_changed():
     This hook is run when a config parameter is changed.
     It also runs on node reboot.
     '''
+    if add_lcm_key():
+        log("PLUMgrid LCM Key added")
+        return 1
     stop_pg()
     configure_sources(update=True)
     pkgs = determine_packages()
@@ -98,7 +101,6 @@ def config_changed():
     for rid in relation_ids('plumgrid-plugin'):
         neutron_plugin_joined(rid)
     ensure_files()
-    add_lcm_key()
     CONFIGS.write_all()
     restart_pg()
 
