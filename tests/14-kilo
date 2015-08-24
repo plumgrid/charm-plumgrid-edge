@@ -9,7 +9,7 @@ class TestDeployment(unittest.TestCase):
     def setUpClass(cls):
         cls.deployment = amulet.Deployment(series='trusty')
         cls.deployment.load_bundle_file(
-            bundle_file='files/plumgrid-edge.yaml',
+            bundle_file='tests/files/plumgrid-edge.yaml',
             deployment_name='test')
         try:
             cls.deployment.setup(timeout=2000)

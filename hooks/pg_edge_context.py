@@ -1,6 +1,7 @@
 # Copyright (c) 2015, PLUMgrid Inc, http://plumgrid.com
 
-# This file contains the class that generates context for PLUMgrid template files.
+# This file contains the class that generates context for
+# PLUMgrid template files.
 
 from charmhelpers.core.hookenv import (
     relation_ids,
@@ -51,7 +52,8 @@ class PGEdgeContext(context.NeutronContext):
 
     def pg_ctxt(self):
         '''
-        Generated Config for all PLUMgrid templates inside the templates folder.
+        Generated Config for all PLUMgrid templates inside the
+        templates folder.
         '''
         pg_ctxt = super(PGEdgeContext, self).pg_ctxt()
         if not pg_ctxt:

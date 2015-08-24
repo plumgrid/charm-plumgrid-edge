@@ -112,7 +112,9 @@ def ensure_files():
     release = os_release('nova-compute', base='kilo')
     if release == 'kilo':
         disable_apparmor_libvirt()
-    write_file(SUDOERS_CONF, "\nnova ALL=(root) NOPASSWD: /opt/pg/bin/ifc_ctl_pp *\n", owner='root', group='root', perms=0o644)
+    write_file(SUDOERS_CONF,
+               "\nnova ALL=(root) NOPASSWD: /opt/pg/bin/ifc_ctl_pp *\n",
+               owner='root', group='root', perms=0o644)
     _exec_cmd(cmd=['mkdir', '-p', FILTERS_CONF_DIR])
     _exec_cmd(cmd=['touch', FILTERS_CONF])
 
@@ -147,7 +149,8 @@ def remove_iovisor():
     '''
     Removes iovisor kernel module.
     '''
-    _exec_cmd(cmd=['rmmod', 'iovisor'], error_msg='Error Loading Iovisor Kernel Module')
+    _exec_cmd(cmd=['rmmod', 'iovisor'],
+              error_msg='Error Loading Iovisor Kernel Module')
 
 
 def check_interface_type():
@@ -203,7 +206,8 @@ def disable_apparmor_libvirt():
     Disables Apparmor profile of libvirtd.
     '''
     apt_install('apparmor-utils')
-    _exec_cmd(['sudo', 'aa-disable', '/usr/sbin/libvirtd'], error_msg='Error disabling AppArmor profile of libvirtd')
+    _exec_cmd(['sudo', 'aa-disable', '/usr/sbin/libvirtd'],
+              error_msg='Error disabling AppArmor profile of libvirtd')
     disable_apparmor()
     service_restart('libvirt-bin')
 
@@ -219,7 +223,8 @@ def disable_apparmor():
         return 0
     filedata = f.read()
     f.close()
-    newdata = filedata.replace("security_driver = \"apparmor\"", "#security_driver = \"apparmor\"")
+    newdata = filedata.replace("security_driver = \"apparmor\"",
+                               "#security_driver = \"apparmor\"")
     f = open(LXC_CONF, 'w')
     f.write(newdata)
     f.close()
