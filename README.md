@@ -1,6 +1,11 @@
+# About the PLUMgrid Platform
+
+The [PLUMgrid Platform](http://www.plumgrid.com/technology/plumgrid-platform/) is a software-only solution that provides a rich set of distributed network functions such as routers, switches, NAT, IPAM, DHCP, and it also supports security policies, end-to-end encryption, and third party Layer 4-7 service insertion.
+
+
 # Overview
 
-This charm is responsible for configuring a Compute node as a PLUMgrid Edge.
+This charm is responsible for configuring a Compute node as a PLUMgrid Edge. 
 
 Once deployed, the charm configures the IO Visor kernel module as a PLUMgrid Edge. The charm also triggers the services essential for a PLUMgrid Edge.
 
