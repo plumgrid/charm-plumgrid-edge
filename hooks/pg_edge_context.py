@@ -70,9 +70,8 @@ class PGEdgeContext(context.NeutronContext):
                 pg_dir_ips = pg_dir_ips + ',' + str(ip)
         pg_ctxt['local_ip'] = pg_dir_ips
         pg_ctxt['pg_hostname'] = "pg-edge"
-        from pg_edge_utils import check_interface_type
-        interface_type = check_interface_type()
-        pg_ctxt['interface'] = interface_type
+        from pg_edge_utils import get_mgmt_interface
+        pg_ctxt['interface'] = get_mgmt_interface()
         pg_ctxt['label'] = get_unit_hostname()
         pg_ctxt['fabric_mode'] = 'host'
 
