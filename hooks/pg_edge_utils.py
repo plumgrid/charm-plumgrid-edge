@@ -249,6 +249,7 @@ def disable_apparmor_libvirt():
     Disables Apparmor profile of libvirtd.
     '''
     apt_install('apparmor-utils')
+    apt_install('cgroup-bin')
     _exec_cmd(['sudo', 'aa-disable', '/usr/sbin/libvirtd'],
               error_msg='Error disabling AppArmor profile of libvirtd',
               verbose=True)
