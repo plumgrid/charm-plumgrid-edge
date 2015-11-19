@@ -180,6 +180,7 @@ def remove_iovisor():
     '''
     _exec_cmd(cmd=['rmmod', 'iovisor'],
               error_msg='Error Loading Iovisor Kernel Module')
+    time.sleep(1)
 
 
 def get_mgmt_interface():
@@ -249,6 +250,7 @@ def disable_apparmor_libvirt():
     Disables Apparmor profile of libvirtd.
     '''
     apt_install('apparmor-utils')
+    apt_install('cgroup-bin')
     _exec_cmd(['sudo', 'aa-disable', '/usr/sbin/libvirtd'],
               error_msg='Error disabling AppArmor profile of libvirtd',
               verbose=True)

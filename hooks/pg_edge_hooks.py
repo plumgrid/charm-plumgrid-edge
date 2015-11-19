@@ -94,6 +94,7 @@ def config_changed():
     pkgs = determine_packages()
     for pkg in pkgs:
         apt_install(pkg, options=['--force-yes'], fatal=True)
+    remove_iovisor()
     load_iovisor()
     ensure_mtu()
     for rid in relation_ids('neutron-plugin'):
