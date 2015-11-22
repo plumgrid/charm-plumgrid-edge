@@ -32,6 +32,7 @@ from pg_edge_utils import (
     remove_iovisor,
     ensure_mtu,
     add_lcm_key,
+    fabric_interface_changed
 )
 
 hooks = Hooks()
@@ -89,6 +90,15 @@ def config_changed():
     if add_lcm_key():
         log("PLUMgrid LCM Key added")
         return 1
+    charm_config = config()
+    if charm_config.changed('fabric-interfaces'):
+        if not fabric_interface_changed():
+            log("Fabric interface already set")
+            return 1
+    if charm_config.changed('os-data-network'):
+        if charm_config['fabric-interfaces'] == 'MANAGEMENT':
+            log('Fabric running on managment network')
+            return 1
     stop_pg()
     configure_sources(update=True)
     pkgs = determine_packages()
