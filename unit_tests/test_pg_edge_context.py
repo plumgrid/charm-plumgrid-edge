@@ -38,7 +38,9 @@ class PGEdgeContextTest(CharmTestCase):
     @patch.object(charmhelpers.contrib.openstack.context,
                   'neutron_plugin_attribute')
     @patch.object(utils, 'get_mgmt_interface')
-    def test_neutroncc_context_api_rel(self, _mgmt_int, _npa, _pg_dir_settings,
+    @patch.object(utils, 'get_fabric_interface')
+    def test_neutroncc_context_api_rel(self, _fabric_int, _mgmt_int,
+                                       _npa, _pg_dir_settings,
                                        _save_flag_file, _config_flag,
                                        _unit_get, _unit_priv_ip, _config,
                                        _is_clus, _https, _ens_pkgs):
@@ -65,6 +67,7 @@ class PGEdgeContextTest(CharmTestCase):
         _config_flag.return_value = False
         _pg_dir_settings.return_value = {'pg_dir_ip': '192.168.100.201'}
         _mgmt_int.return_value = 'juju-br0'
+        _fabric_int.return_value = 'juju-br0'
         napi_ctxt = context.PGEdgeContext()
         expect = {
             'config': 'neutron.randomconfig',
@@ -76,6 +79,7 @@ class PGEdgeContextTest(CharmTestCase):
             'neutron_url': 'https://192.168.100.201:9696',
             'pg_hostname': 'pg-edge',
             'interface': 'juju-br0',
+            'fabric_interface': 'juju-br0',
             'label': 'node0',
             'fabric_mode': 'host',
             'neutron_alchemy_flags': False,
