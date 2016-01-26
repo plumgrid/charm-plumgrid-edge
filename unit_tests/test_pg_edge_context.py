@@ -77,7 +77,7 @@ class PGEdgeContextTest(CharmTestCase):
             'neutron_plugin': 'plumgrid',
             'neutron_security_groups': None,
             'neutron_url': 'https://192.168.100.201:9696',
-            'pg_hostname': 'pg-edge',
+            'pg_hostname': 'node0',
             'interface': 'juju-br0',
             'fabric_interface': 'juju-br0',
             'label': 'node0',
