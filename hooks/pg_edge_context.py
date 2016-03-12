@@ -5,14 +5,14 @@
 
 from charmhelpers.contrib.openstack import context
 from charmhelpers.contrib.openstack.utils import get_host_ip
-from socket import (
-    gethostname,
-    getfqdn
-)
 from charmhelpers.core.hookenv import (
     relation_ids,
     related_units,
     relation_get,
+)
+from socket import (
+    gethostname,
+    getfqdn
 )
 
 
