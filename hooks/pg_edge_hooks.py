@@ -32,6 +32,8 @@ from pg_edge_utils import (
     remove_iovisor,
     ensure_mtu,
     add_lcm_key,
+    fabric_interface_changed,
+    load_iptables
 )
 
 hooks = Hooks()
@@ -43,6 +45,7 @@ def install():
     '''
     Install hook is run when the charm is first deployed on a node.
     '''
+    load_iptables()
     configure_sources(update=True)
     pkgs = determine_packages()
     for pkg in pkgs:
@@ -89,6 +92,15 @@ def config_changed():
     if add_lcm_key():
         log("PLUMgrid LCM Key added")
         return 1
+    charm_config = config()
+    if charm_config.changed('fabric-interfaces'):
+        if not fabric_interface_changed():
+            log("Fabric interface already set")
+            return 1
+    if charm_config.changed('os-data-network'):
+        if charm_config['fabric-interfaces'] == 'MANAGEMENT':
+            log('Fabric running on managment network')
+            return 1
     stop_pg()
     configure_sources(update=True)
     pkgs = determine_packages()
@@ -104,6 +116,11 @@ def config_changed():
     ensure_files()
     CONFIGS.write_all()
     restart_pg()
+
+
+@hooks.hook('upgrade-charm')
+def upgrade_charm():
+    load_iptables()
 
 
 @hooks.hook('stop')
