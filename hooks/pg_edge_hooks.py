@@ -89,11 +89,10 @@ def config_changed():
     This hook is run when a config parameter is changed.
     It also runs on node reboot.
     '''
+    if add_lcm_key():
+        log("PLUMgrid LCM Key added")
+        return 1
     charm_config = config()
-    if charm_config.changed('lcm-ssh-key'):
-        if add_lcm_key():
-            log("PLUMgrid LCM Key added")
-            return 1
     if charm_config.changed('fabric-interfaces'):
         if not fabric_interface_changed():
             log("Fabric interface already set")
