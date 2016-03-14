@@ -32,6 +32,8 @@ from pg_edge_utils import (
     remove_iovisor,
     ensure_mtu,
     add_lcm_key,
+    fabric_interface_changed,
+    load_iptables
 )
 
 hooks = Hooks()
@@ -43,6 +45,7 @@ def install():
     '''
     Install hook is run when the charm is first deployed on a node.
     '''
+    load_iptables()
     configure_sources(update=True)
     pkgs = determine_packages()
     for pkg in pkgs:
@@ -86,20 +89,40 @@ def config_changed():
     This hook is run when a config parameter is changed.
     It also runs on node reboot.
     '''
-    if add_lcm_key():
-        log("PLUMgrid LCM Key added")
-        return 1
+    charm_config = config()
+    if charm_config.changed('lcm-ssh-key'):
+        if add_lcm_key():
+            log("PLUMgrid LCM Key added")
+            return 1
+    if charm_config.changed('fabric-interfaces'):
+        if not fabric_interface_changed():
+            log("Fabric interface already set")
+            return 1
+    if charm_config.changed('os-data-network'):
+        if charm_config['fabric-interfaces'] == 'MANAGEMENT':
+            log('Fabric running on managment network')
+            return 1
     stop_pg()
     configure_sources(update=True)
     pkgs = determine_packages()
     for pkg in pkgs:
         apt_install(pkg, options=['--force-yes'], fatal=True)
+    remove_iovisor()
     load_iovisor()
     ensure_mtu()
     for rid in relation_ids('neutron-plugin'):
         neutron_plugin_joined(rid)
     for rid in relation_ids('plumgrid-plugin'):
         neutron_plugin_joined(rid)
+    ensure_files()
+    CONFIGS.write_all()
+    restart_pg()
+
+
+@hooks.hook('upgrade-charm')
+def upgrade_charm():
+    load_iptables()
+    ensure_mtu()
     ensure_files()
     CONFIGS.write_all()
     restart_pg()

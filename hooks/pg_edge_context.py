@@ -3,14 +3,17 @@
 # This file contains the class that generates context for
 # PLUMgrid template files.
 
+from charmhelpers.contrib.openstack import context
+from charmhelpers.contrib.openstack.utils import get_host_ip
 from charmhelpers.core.hookenv import (
     relation_ids,
     related_units,
     relation_get,
 )
-from charmhelpers.contrib.openstack import context
-from charmhelpers.contrib.openstack.utils import get_host_ip
-from socket import gethostname as get_unit_hostname
+from socket import (
+    gethostname,
+    getfqdn
+)
 
 
 def _pg_dir_settings():
@@ -60,7 +63,7 @@ class PGEdgeContext(context.NeutronContext):
             return {}
 
         pg_dir_ips = ''
-        pg_dir_settings = _pg_dir_settings()
+        pg_dir_settings = sorted(_pg_dir_settings())
         single_ip = True
         for ip in pg_dir_settings:
             if single_ip:
@@ -69,10 +72,13 @@ class PGEdgeContext(context.NeutronContext):
             else:
                 pg_dir_ips = pg_dir_ips + ',' + str(ip)
         pg_ctxt['local_ip'] = pg_dir_ips
-        pg_ctxt['pg_hostname'] = "pg-edge"
-        from pg_edge_utils import get_mgmt_interface
+        unit_hostname = gethostname()
+        pg_ctxt['pg_hostname'] = unit_hostname
+        pg_ctxt['pg_fqdn'] = getfqdn()
+        from pg_edge_utils import get_mgmt_interface, get_fabric_interface
         pg_ctxt['interface'] = get_mgmt_interface()
-        pg_ctxt['label'] = get_unit_hostname()
+        pg_ctxt['fabric_interface'] = get_fabric_interface()
+        pg_ctxt['label'] = unit_hostname
         pg_ctxt['fabric_mode'] = 'host'
 
         return pg_ctxt
