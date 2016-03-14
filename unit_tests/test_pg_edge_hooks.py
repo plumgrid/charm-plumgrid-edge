@@ -32,6 +32,7 @@ TO_PATCH = [
     'config',
     'relation_set',
     'relation_ids',
+    'load_iptables'
 ]
 NEUTRON_CONF_DIR = "/etc/neutron"
 

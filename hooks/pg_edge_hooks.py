@@ -32,7 +32,8 @@ from pg_edge_utils import (
     remove_iovisor,
     ensure_mtu,
     add_lcm_key,
-    fabric_interface_changed
+    fabric_interface_changed,
+    load_iptables
 )
 
 hooks = Hooks()
@@ -44,6 +45,7 @@ def install():
     '''
     Install hook is run when the charm is first deployed on a node.
     '''
+    load_iptables()
     configure_sources(update=True)
     pkgs = determine_packages()
     for pkg in pkgs:
@@ -111,6 +113,15 @@ def config_changed():
         neutron_plugin_joined(rid)
     for rid in relation_ids('plumgrid-plugin'):
         neutron_plugin_joined(rid)
+    ensure_files()
+    CONFIGS.write_all()
+    restart_pg()
+
+
+@hooks.hook('upgrade-charm')
+def upgrade_charm():
+    load_iptables()
+    ensure_mtu()
     ensure_files()
     CONFIGS.write_all()
     restart_pg()
