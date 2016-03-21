@@ -106,6 +106,7 @@ def config_changed():
             log('Fabric running on managment network')
     if (charm_config.changed('install_sources') or
         charm_config.changed('plumgrid-build') or
+        charm_config.changed('install_keys') or
             charm_config.changed('iovisor-build')):
         stop_pg()
         configure_sources(update=True)
