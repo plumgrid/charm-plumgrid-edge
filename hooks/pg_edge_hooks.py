@@ -6,7 +6,7 @@
 # in this file.
 
 import sys
-
+from charmhelpers.core.host import service_running
 from charmhelpers.core.hookenv import (
     Hooks,
     UnregisteredHookError,
@@ -21,8 +21,6 @@ from charmhelpers.fetch import (
     apt_purge,
     configure_sources,
 )
-
-from charmhelpers.core.host import service_running
 
 from pg_edge_utils import (
     register_configs,
@@ -104,6 +102,7 @@ def config_changed():
         charm_config.changed('plumgrid-build') or
         charm_config.changed('install_keys') or
             charm_config.changed('iovisor-build')):
+        ensure_files()
         stop_pg()
         configure_sources(update=True)
         pkgs = determine_packages()
@@ -117,7 +116,6 @@ def config_changed():
             neutron_plugin_joined(rid)
         for rid in relation_ids('plumgrid-plugin'):
             neutron_plugin_joined(rid)
-    ensure_files()
     CONFIGS.write_all()
     if not service_running('plumgrid'):
         restart_pg()
