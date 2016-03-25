@@ -83,10 +83,6 @@ class PGEdgeHooksTests(CharmTestCase):
             **rel_data
         )
 
-    def test_config_changed_hook(self):
-        self.add_lcm_key.return_value = 1
-        self._call_hook('config-changed')
-
     def test_stop(self):
         _pkgs = ['plumgrid-lxc', 'iovisor-dkms']
         self._call_hook('stop')

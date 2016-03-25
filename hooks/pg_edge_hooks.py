@@ -6,6 +6,7 @@
 # in this file.
 
 import sys
+from charmhelpers.core.host import service_running
 
 from charmhelpers.core.hookenv import (
     Hooks,
@@ -89,33 +90,37 @@ def config_changed():
     This hook is run when a config parameter is changed.
     It also runs on node reboot.
     '''
-    if add_lcm_key():
-        log("PLUMgrid LCM Key added")
-        return 1
     charm_config = config()
+    if charm_config.changed('lcm-ssh-key'):
+        if add_lcm_key():
+            log("PLUMgrid LCM Key added")
     if charm_config.changed('fabric-interfaces'):
         if not fabric_interface_changed():
             log("Fabric interface already set")
-            return 1
-    if charm_config.changed('os-data-network'):
-        if charm_config['fabric-interfaces'] == 'MANAGEMENT':
-            log('Fabric running on managment network')
-            return 1
-    stop_pg()
-    configure_sources(update=True)
-    pkgs = determine_packages()
-    for pkg in pkgs:
-        apt_install(pkg, options=['--force-yes'], fatal=True)
-    remove_iovisor()
-    load_iovisor()
+        else:
+            stop_pg()
+    if (charm_config.changed('install_sources') or
+        charm_config.changed('plumgrid-build') or
+        charm_config.changed('install_keys') or
+            charm_config.changed('iovisor-build')):
+        ensure_files()
+        stop_pg()
+        configure_sources(update=True)
+        pkgs = determine_packages()
+        for pkg in pkgs:
+            apt_install(pkg, options=['--force-yes'], fatal=True)
+            remove_iovisor()
+            load_iovisor()
+    if charm_config.changed('metadata-shared-key'):
+        stop_pg()
+        for rid in relation_ids('neutron-plugin'):
+            neutron_plugin_joined(rid)
+        for rid in relation_ids('plumgrid-plugin'):
+            neutron_plugin_joined(rid)
     ensure_mtu()
-    for rid in relation_ids('neutron-plugin'):
-        neutron_plugin_joined(rid)
-    for rid in relation_ids('plumgrid-plugin'):
-        neutron_plugin_joined(rid)
-    ensure_files()
     CONFIGS.write_all()
-    restart_pg()
+    if not service_running('plumgrid'):
+        restart_pg()
 
 
 @hooks.hook('upgrade-charm')
