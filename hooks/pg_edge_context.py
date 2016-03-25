@@ -16,16 +16,23 @@ from socket import (
 )
 
 
-def _pg_dir_settings():
+def _pg_dir_context():
     '''
     Inspects relation with PLUMgrid director.
     '''
-    director_ips = []
+    ctxt = {
+        'opsvm_ip': '127.0.0.1',
+        'director_ips': [],
+    }
     for rid in relation_ids('plumgrid'):
         for unit in related_units(rid):
             rdata = relation_get(rid=rid, unit=unit)
-            director_ips.append(str(get_host_ip(rdata['private-address'])))
-    return director_ips
+            ctxt['director_ips'
+                 ].append(str(get_host_ip(rdata['private-address'])))
+            if "opsvm_ip" in rdata:
+                ctxt['opsvm_ip'] = \
+                    rdata['opsvm_ip']
+    return ctxt
 
 
 class PGEdgeContext(context.NeutronContext):
@@ -62,16 +69,17 @@ class PGEdgeContext(context.NeutronContext):
         if not pg_ctxt:
             return {}
 
-        pg_dir_ips = ''
-        pg_dir_settings = sorted(_pg_dir_settings())
-        single_ip = True
-        for ip in pg_dir_settings:
-            if single_ip:
-                pg_dir_ips = str(ip)
-                single_ip = False
+        pg_dir_context = _pg_dir_context()
+        pg_dir_ips_str = ''
+        pg_dir_ips_array = sorted(pg_dir_context['director_ips'])
+        single_dir = True
+        for ip in pg_dir_ips_array:
+            if single_dir:
+                pg_dir_ips_str = str(ip)
+                single_dir = False
             else:
-                pg_dir_ips = pg_dir_ips + ',' + str(ip)
-        pg_ctxt['local_ip'] = pg_dir_ips
+                pg_dir_ips_str = pg_dir_ips_str + ',' + str(ip)
+        pg_ctxt['dir_ips'] = pg_dir_ips_str
         unit_hostname = gethostname()
         pg_ctxt['pg_hostname'] = unit_hostname
         pg_ctxt['pg_fqdn'] = getfqdn()
@@ -80,5 +88,6 @@ class PGEdgeContext(context.NeutronContext):
         pg_ctxt['fabric_interface'] = get_fabric_interface()
         pg_ctxt['label'] = unit_hostname
         pg_ctxt['fabric_mode'] = 'host'
+        pg_ctxt['opsvm_ip'] = pg_dir_context['opsvm_ip']
 
         return pg_ctxt
