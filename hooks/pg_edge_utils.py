@@ -49,6 +49,7 @@ PG_CONF = '%s/conf/pg/plumgrid.conf' % PG_LXC_DATA_PATH
 PG_HN_CONF = '%s/conf/etc/hostname' % PG_LXC_DATA_PATH
 PG_HS_CONF = '%s/conf/etc/hosts' % PG_LXC_DATA_PATH
 PG_IFCS_CONF = '%s/conf/pg/ifcs.conf' % PG_LXC_DATA_PATH
+OPS_CONF = '%s/conf/etc/00-pg.conf' % PG_LXC_DATA_PATH
 AUTH_KEY_PATH = '%s/root/.ssh/authorized_keys' % PG_LXC_DATA_PATH
 SUDOERS_CONF = '/etc/sudoers.d/ifc_ctl_sudoers'
 FILTERS_CONF_DIR = '/etc/nova/rootwrap.d'
@@ -64,6 +65,10 @@ BASE_RESOURCE_MAP = OrderedDict([
         'contexts': [pg_edge_context.PGEdgeContext()],
     }),
     (PG_HS_CONF, {
+        'services': ['plumgrid'],
+        'contexts': [pg_edge_context.PGEdgeContext()],
+    }),
+    (OPS_CONF, {
         'services': ['plumgrid'],
         'contexts': [pg_edge_context.PGEdgeContext()],
     }),

@@ -64,7 +64,6 @@ def director_joined():
     plumgrid-director is made or changed.
     '''
     ensure_mtu()
-    ensure_files()
     add_lcm_key()
     CONFIGS.write_all()
     restart_pg()
@@ -102,7 +101,6 @@ def config_changed():
         charm_config.changed('plumgrid-build') or
         charm_config.changed('install_keys') or
             charm_config.changed('iovisor-build')):
-        ensure_files()
         stop_pg()
         configure_sources(update=True)
         pkgs = determine_packages()
@@ -125,7 +123,6 @@ def config_changed():
 def upgrade_charm():
     load_iptables()
     ensure_mtu()
-    ensure_files()
     CONFIGS.write_all()
     restart_pg()
 
