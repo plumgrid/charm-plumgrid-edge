@@ -76,7 +76,7 @@ class PGEdgeContextTest(CharmTestCase):
             'config': 'neutron.randomconfig',
             'core_plugin': 'neutron.randomdriver',
             'local_ip': '192.168.100.203',
-            'dir_ips': '192.168.100.201',
+            'director_ips_string': '192.168.100.201',
             'network_manager': 'neutron',
             'neutron_plugin': 'plumgrid',
             'neutron_security_groups': None,

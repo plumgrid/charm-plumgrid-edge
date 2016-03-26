@@ -70,16 +70,15 @@ class PGEdgeContext(context.NeutronContext):
             return {}
 
         pg_dir_context = _pg_dir_context()
-        pg_dir_ips_str = ''
-        pg_dir_ips_array = sorted(pg_dir_context['director_ips'])
-        single_dir = True
-        for ip in pg_dir_ips_array:
-            if single_dir:
-                pg_dir_ips_str = str(ip)
-                single_dir = False
-            else:
-                pg_dir_ips_str = pg_dir_ips_str + ',' + str(ip)
-        pg_ctxt['dir_ips'] = pg_dir_ips_str
+        pg_dir_ips = sorted(pg_dir_context['director_ips'])
+        dir_count = len(pg_dir_ips)
+        pg_ctxt['director_ips_string'] = (str(pg_dir_ips[0]) + ',' +
+                                          str(pg_dir_ips[1]) + ',' +
+                                          str(pg_dir_ips[2])
+                                          if dir_count == 3 else
+                                          str(pg_dir_ips[0])
+                                          if dir_count == 1 else
+                                          '')
         unit_hostname = gethostname()
         pg_ctxt['pg_hostname'] = unit_hostname
         pg_ctxt['pg_fqdn'] = getfqdn()
