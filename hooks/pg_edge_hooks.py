@@ -27,6 +27,7 @@ from pg_edge_utils import (
     register_configs,
     ensure_files,
     restart_pg,
+    restart_map,
     stop_pg,
     determine_packages,
     load_iovisor,
@@ -34,7 +35,9 @@ from pg_edge_utils import (
     ensure_mtu,
     add_lcm_key,
     fabric_interface_changed,
-    load_iptables
+    load_iptables,
+    restart_on_change,
+    director_cluster_ready
 )
 
 hooks = Hooks()
@@ -58,15 +61,15 @@ def install():
 
 
 @hooks.hook('plumgrid-relation-changed')
+@restart_on_change(restart_map())
 def director_changed():
     '''
     This hook is run when relation between plumgrid-edge and
     plumgrid-director is made or changed.
     '''
-    ensure_mtu()
-    add_lcm_key()
-    CONFIGS.write_all()
-    restart_pg()
+    if director_cluster_ready():
+        ensure_mtu()
+        CONFIGS.write_all()
 
 
 @hooks.hook('neutron-plugin-relation-joined')
@@ -121,10 +124,10 @@ def config_changed():
 
 
 @hooks.hook('upgrade-charm')
+@restart_on_change(restart_map())
 def upgrade_charm():
     ensure_mtu()
     CONFIGS.write_all()
-    restart_pg()
 
 
 @hooks.hook('stop')
