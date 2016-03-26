@@ -32,7 +32,8 @@ TO_PATCH = [
     'config',
     'relation_set',
     'relation_ids',
-    'load_iptables'
+    'load_iptables',
+    'director_cluster_ready'
 ]
 NEUTRON_CONF_DIR = "/etc/neutron"
 
@@ -64,13 +65,11 @@ class PGEdgeHooksTests(CharmTestCase):
         self.ensure_files.assert_called_with()
         self.add_lcm_key.assert_called_with()
 
-    def test_plumgrid_joined(self):
-        self._call_hook('plumgrid-relation-joined')
+    def test_plumgrid_changed(self):
+        self._call_hook('plumgrid-relation-changed')
+        self.director_cluster_ready.return_value = True
         self.ensure_mtu.assert_called_with()
-        self.ensure_files.assert_called_with()
-        self.add_lcm_key.assert_called_with()
         self.CONFIGS.write_all.assert_called_with()
-        self.restart_pg.assert_called_with()
 
     def test_neutron_plugin_joined(self):
         self.test_config.set('metadata-shared-key', 'plumgrid')

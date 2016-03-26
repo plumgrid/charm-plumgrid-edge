@@ -35,13 +35,13 @@ class PGEdgeContextTest(CharmTestCase):
     @patch.object(charmhelpers.contrib.openstack.context,
                   'config_flags_parser')
     @patch.object(context.PGEdgeContext, '_save_flag_file')
-    @patch.object(context, '_pg_dir_settings')
+    @patch.object(context, '_pg_dir_context')
     @patch.object(charmhelpers.contrib.openstack.context,
                   'neutron_plugin_attribute')
     @patch.object(utils, 'get_mgmt_interface')
     @patch.object(utils, 'get_fabric_interface')
     def test_neutroncc_context_api_rel(self, _fabric_int, _mgmt_int,
-                                       _npa, _pg_dir_settings,
+                                       _npa, _pg_dir_context,
                                        _save_flag_file, _config_flag,
                                        _unit_get, _unit_priv_ip, _config,
                                        _is_clus, _https, _ens_pkgs):
@@ -61,24 +61,26 @@ class PGEdgeContextTest(CharmTestCase):
 
         self.maxDiff = None
         _npa.side_effect = mock_npa
-        _unit_get.return_value = '192.168.100.201'
-        _unit_priv_ip.return_value = '192.168.100.201'
+        _unit_get.return_value = '192.168.100.203'
+        _unit_priv_ip.return_value = '192.168.100.203'
         self.gethostname.return_value = 'node0'
         self.getfqdn.return_value = 'node0.maas'
         _is_clus.return_value = False
         _config_flag.return_value = False
-        _pg_dir_settings.return_value = {'pg_dir_ip': '192.168.100.201'}
+        _pg_dir_context.return_value = {'director_ips': ['192.168.100.201'],
+                                        'opsvm_ip': '127.0.0.1'}
         _mgmt_int.return_value = 'juju-br0'
         _fabric_int.return_value = 'juju-br0'
         napi_ctxt = context.PGEdgeContext()
         expect = {
             'config': 'neutron.randomconfig',
             'core_plugin': 'neutron.randomdriver',
-            'local_ip': 'pg_dir_ip',
+            'local_ip': '192.168.100.203',
+            'dir_ips': '192.168.100.201',
             'network_manager': 'neutron',
             'neutron_plugin': 'plumgrid',
             'neutron_security_groups': None,
-            'neutron_url': 'https://192.168.100.201:9696',
+            'neutron_url': 'https://192.168.100.203:9696',
             'pg_hostname': 'node0',
             'pg_fqdn': 'node0.maas',
             'interface': 'juju-br0',
@@ -86,5 +88,6 @@ class PGEdgeContextTest(CharmTestCase):
             'label': 'node0',
             'fabric_mode': 'host',
             'neutron_alchemy_flags': False,
+            'opsvm_ip': '127.0.0.1',
         }
         self.assertEquals(expect, napi_ctxt())

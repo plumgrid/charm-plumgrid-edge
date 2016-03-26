@@ -419,11 +419,8 @@ def get_cidr_from_iface(interface):
 
 
 def director_cluster_ready():
-    dirs_count=len(pg_edge_context._pg_dir_context()['director_ips'])
-    if dirs_count == 1 or dirs_count == 3:
-        return True
-    else:
-        return False
+    dirs_count = len(pg_edge_context._pg_dir_context()['director_ips'])
+    return True if dirs_count == 1 or dirs_count == 3 else False
 
 
 def restart_on_change(restart_map):
