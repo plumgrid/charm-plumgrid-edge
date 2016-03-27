@@ -19,7 +19,6 @@ from charmhelpers.core.hookenv import (
 
 from charmhelpers.fetch import (
     apt_install,
-    apt_purge,
     configure_sources,
 )
 
@@ -136,10 +135,6 @@ def stop():
     This hook is run when the charm is destroyed.
     '''
     stop_pg()
-    remove_iovisor()
-    pkgs = determine_packages()
-    for pkg in pkgs:
-        apt_purge(pkg, fatal=False)
 
 
 def main():

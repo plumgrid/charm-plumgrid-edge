@@ -83,8 +83,5 @@ class PGEdgeHooksTests(CharmTestCase):
         )
 
     def test_stop(self):
-        _pkgs = ['plumgrid-lxc', 'iovisor-dkms']
         self._call_hook('stop')
         self.stop_pg.assert_called_with()
-        self.remove_iovisor.assert_called_with()
-        self.determine_packages.return_value = _pkgs
