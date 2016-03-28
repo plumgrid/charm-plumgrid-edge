@@ -19,7 +19,6 @@ from charmhelpers.core.hookenv import (
 
 from charmhelpers.fetch import (
     apt_install,
-    apt_purge,
     configure_sources,
 )
 
@@ -27,6 +26,7 @@ from pg_edge_utils import (
     register_configs,
     ensure_files,
     restart_pg,
+    restart_map,
     stop_pg,
     determine_packages,
     load_iovisor,
@@ -34,7 +34,9 @@ from pg_edge_utils import (
     ensure_mtu,
     add_lcm_key,
     fabric_interface_changed,
-    load_iptables
+    load_iptables,
+    restart_on_change,
+    director_cluster_ready
 )
 
 hooks = Hooks()
@@ -57,18 +59,16 @@ def install():
     add_lcm_key()
 
 
-@hooks.hook('plumgrid-relation-joined')
 @hooks.hook('plumgrid-relation-changed')
-def director_joined():
+@restart_on_change(restart_map())
+def director_changed():
     '''
     This hook is run when relation between plumgrid-edge and
     plumgrid-director is made or changed.
     '''
-    ensure_mtu()
-    ensure_files()
-    add_lcm_key()
-    CONFIGS.write_all()
-    restart_pg()
+    if director_cluster_ready():
+        ensure_mtu()
+        CONFIGS.write_all()
 
 
 @hooks.hook('neutron-plugin-relation-joined')
@@ -103,7 +103,6 @@ def config_changed():
         charm_config.changed('plumgrid-build') or
         charm_config.changed('install_keys') or
             charm_config.changed('iovisor-build')):
-        ensure_files()
         stop_pg()
         configure_sources(update=True)
         pkgs = determine_packages()
@@ -124,12 +123,10 @@ def config_changed():
 
 
 @hooks.hook('upgrade-charm')
+@restart_on_change(restart_map())
 def upgrade_charm():
-    load_iptables()
     ensure_mtu()
-    ensure_files()
     CONFIGS.write_all()
-    restart_pg()
 
 
 @hooks.hook('stop')
@@ -138,10 +135,6 @@ def stop():
     This hook is run when the charm is destroyed.
     '''
     stop_pg()
-    remove_iovisor()
-    pkgs = determine_packages()
-    for pkg in pkgs:
-        apt_purge(pkg, fatal=False)
 
 
 def main():

@@ -18,7 +18,6 @@ utils.restart_map = _map
 TO_PATCH = [
     'remove_iovisor',
     'apt_install',
-    'apt_purge',
     'CONFIGS',
     'log',
     'configure_sources',
@@ -32,7 +31,8 @@ TO_PATCH = [
     'config',
     'relation_set',
     'relation_ids',
-    'load_iptables'
+    'load_iptables',
+    'director_cluster_ready'
 ]
 NEUTRON_CONF_DIR = "/etc/neutron"
 
@@ -64,13 +64,11 @@ class PGEdgeHooksTests(CharmTestCase):
         self.ensure_files.assert_called_with()
         self.add_lcm_key.assert_called_with()
 
-    def test_plumgrid_joined(self):
-        self._call_hook('plumgrid-relation-joined')
+    def test_plumgrid_changed(self):
+        self._call_hook('plumgrid-relation-changed')
+        self.director_cluster_ready.return_value = True
         self.ensure_mtu.assert_called_with()
-        self.ensure_files.assert_called_with()
-        self.add_lcm_key.assert_called_with()
         self.CONFIGS.write_all.assert_called_with()
-        self.restart_pg.assert_called_with()
 
     def test_neutron_plugin_joined(self):
         self.test_config.set('metadata-shared-key', 'plumgrid')
@@ -84,8 +82,5 @@ class PGEdgeHooksTests(CharmTestCase):
         )
 
     def test_stop(self):
-        _pkgs = ['plumgrid-lxc', 'iovisor-dkms']
         self._call_hook('stop')
         self.stop_pg.assert_called_with()
-        self.remove_iovisor.assert_called_with()
-        self.determine_packages.return_value = _pkgs

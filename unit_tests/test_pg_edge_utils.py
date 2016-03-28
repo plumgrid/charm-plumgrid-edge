@@ -54,6 +54,7 @@ class TestPGEdgeUtils(CharmTestCase):
                  nutils.PG_HN_CONF,
                  nutils.PG_HS_CONF,
                  nutils.PG_IFCS_CONF,
+                 nutils.OPS_CONF,
                  '/etc/nova/rootwrap.d/network.filters']
         self.assertItemsEqual(_regconfs.configs, confs)
 
@@ -70,6 +71,7 @@ class TestPGEdgeUtils(CharmTestCase):
             (nutils.PG_CONF, ['plumgrid']),
             (nutils.PG_HN_CONF, ['plumgrid']),
             (nutils.PG_HS_CONF, ['plumgrid']),
+            (nutils.OPS_CONF, ['plumgrid']),
             (nutils.PG_IFCS_CONF, []),
             (nutils.FILTERS_CONF, []),
         ])
