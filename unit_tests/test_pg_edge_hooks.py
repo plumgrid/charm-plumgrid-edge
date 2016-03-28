@@ -18,7 +18,6 @@ utils.restart_map = _map
 TO_PATCH = [
     'remove_iovisor',
     'apt_install',
-    'apt_purge',
     'CONFIGS',
     'log',
     'configure_sources',
