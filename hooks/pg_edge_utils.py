@@ -43,6 +43,7 @@ from charmhelpers.contrib.openstack.utils import (
     os_release,
 )
 
+SOURCES_LIST = '/etc/apt/sources.list'
 SHARED_SECRET = "/etc/nova/secret.txt"
 LXC_CONF = '/etc/libvirt/lxc.conf'
 TEMPLATES = 'templates/'
@@ -83,6 +84,23 @@ BASE_RESOURCE_MAP = OrderedDict([
         'contexts': [pg_edge_context.PGEdgeContext()],
     }),
 ])
+
+
+def configure_pg_sources():
+    '''
+    Returns true if install sources is updated in sources.list file
+    '''
+    try:
+        with open(SOURCES_LIST, 'r+') as sources:
+            all_lines = sources.readlines()
+            sources.seek(0)
+            for i in (line for line in all_lines if "plumgrid" not in line):
+                sources.write(i)
+            sources.truncate()
+        sources.close()
+        return True
+    except IOError:
+        return False
 
 
 def determine_packages():
