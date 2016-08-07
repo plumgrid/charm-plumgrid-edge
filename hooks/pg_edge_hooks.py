@@ -38,7 +38,8 @@ from pg_edge_utils import (
     load_iptables,
     restart_on_change,
     director_cluster_ready,
-    configure_pg_sources
+    configure_pg_sources,
+    configure_analyst_opsvm
 )
 
 hooks = Hooks()
@@ -72,6 +73,7 @@ def director_changed():
     '''
     if director_cluster_ready():
         ensure_mtu()
+        configure_analyst_opsvm()
         CONFIGS.write_all()
 
 
