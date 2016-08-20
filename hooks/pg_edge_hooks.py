@@ -77,6 +77,16 @@ def director_changed():
         CONFIGS.write_all()
 
 
+@hooks.hook('plumgrid-relation-joined')
+def edge_node_joined(relation_id=None):
+    '''
+    This hook is run when relation between plumgrid-edge and
+    plumgrid-director is made.
+    '''
+    rel_data = {'edge-peer': 'edge-peer'}
+    relation_set(relation_id=relation_id, **rel_data)
+
+
 @hooks.hook('neutron-plugin-relation-joined')
 @hooks.hook('plumgrid-plugin-relation-joined')
 def neutron_plugin_joined(relation_id=None):

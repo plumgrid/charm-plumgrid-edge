@@ -21,6 +21,8 @@ from charmhelpers.core.hookenv import (
 )
 from charmhelpers.contrib.network.ip import (
     get_iface_from_addr,
+    get_host_ip,
+    get_iface_addr,
     get_bridges,
     get_bridge_nics,
 )
@@ -107,8 +109,8 @@ def configure_analyst_opsvm():
     if not service_running('plumgrid'):
         restart_pg()
     opsvm_ip = pg_edge_context._pg_dir_context()['opsvm_ip']
-    NS_ENTER = ('/opt/local/bin/nsenter -t $(ps ho pid --ppid '
-                '$(cat /var/run/libvirt/lxc/plumgrid.pid)) -m -n -u -i -p ')
+    NS_ENTER = ('/opt/local/bin/nsenter -t $(ps ho pid --ppid $(cat'
+                '/var/run/libvirt/lxc/plumgrid.pid)) -m -n -u -i -p ')
     sigmund_stop = NS_ENTER + '/usr/bin/service plumgrid-sigmund stop'
     sigmund_status = NS_ENTER \
         + '/usr/bin/service plumgrid-sigmund status'
@@ -263,7 +265,13 @@ def get_mgmt_interface():
     '''
     mgmt_interface = config('mgmt-interface')
     if not mgmt_interface:
-        return get_iface_from_addr(unit_get('private-address'))
+        try:
+            return get_iface_from_addr(unit_get('private-address'))
+        except:
+            for bridge_interface in get_bridges():
+                if (get_host_ip(unit_get('private-address'))
+                        in get_iface_addr(bridge_interface)):
+                    return bridge_interface
     elif interface_exists(mgmt_interface):
         return mgmt_interface
     else:
