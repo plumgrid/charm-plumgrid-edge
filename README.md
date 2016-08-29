@@ -30,7 +30,7 @@ For plumgrid-edge to work make the configuration in the neutron-api, neutron-api
 
 # Known Limitations and Issues
 
-This is an early access version of the PLUMgrid Edge charm and it is not meant for production deployments. The charm currently only supports Kilo Openstack Release.
+This charm currently doesn't support Ubuntu 16.04.
 
 # Configuration
 
@@ -57,4 +57,5 @@ The virtual IP passed on in the neutron-api charm has to be same as the one pass
 # Contact Information
 
 Bilal Baqar <bbaqar@plumgrid.com>
-Bilal Ahmad <bilal@plumgrid.com>
+Javeria Khan <javeriak@plumgrid.com>
+Junaid Ali <junaidali@plumgrid.com>
