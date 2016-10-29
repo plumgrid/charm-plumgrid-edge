@@ -39,7 +39,8 @@ from pg_edge_utils import (
     restart_on_change,
     director_cluster_ready,
     configure_pg_sources,
-    configure_analyst_opsvm
+    configure_analyst_opsvm,
+    remove_ifc_list
 )
 
 hooks = Hooks()
@@ -115,6 +116,7 @@ def config_changed():
             log("Fabric interface already set")
         else:
             stop_pg()
+            remove_ifc_list()
     if (charm_config.changed('install_sources') or
         charm_config.changed('plumgrid-build') or
         charm_config.changed('install_keys') or

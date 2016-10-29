@@ -7,8 +7,14 @@ description: |
   provides the data plane and network connectivity for OpenStack tenant
   instances. Communication between instances on compute nodes is enabled
   by creation of VXLAN based overlay tunnels and networks.
+series:
+  - trusty
+  - xenial
 tags:
   - openstack
+extra-bindings:
+  internal:
+  fabric:
 provides:
   neutron-plugin:
     interface: neutron-plugin

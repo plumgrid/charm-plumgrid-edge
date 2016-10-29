@@ -34,7 +34,8 @@ TO_PATCH = [
     'load_iptables',
     'director_cluster_ready',
     'status_set',
-    'configure_analyst_opsvm'
+    'configure_analyst_opsvm',
+    'remove_ifc_list'
 ]
 NEUTRON_CONF_DIR = "/etc/neutron"
 

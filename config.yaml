@@ -5,15 +5,15 @@ options:
     description: Public SSH key of PLUMgrid LCM which is running PG-Tools
   mgmt-interface:
     type: string
+    default:
     description: The interface connected to PLUMgrid Managment network.
   fabric-interfaces:
-    default: 'MANAGEMENT'
+    default:
     type: string
     description: |
        Interfaces that will provide fabric connectivity on the director nodes.
-       Provided in form of json in a string. Default value is MANAGEMENT which
-       will configure the management interface as the fabric interface on each
-       director.
+       Provided in form of json in a string. If no value provided, fabric connnectivity
+       will be either mapped using binding or fall back to management network.
   network-device-mtu:
     type: string
     default: '1580'

@@ -28,10 +28,6 @@ Instructions on using the charm:
 
 For plumgrid-edge to work make the configuration in the neutron-api, neutron-api-plumgrid and plumgrid-director charms as specified in the configuration section below.
 
-# Known Limitations and Issues
-
-This charm currently doesn't support Ubuntu 16.04.
-
 # Configuration
 
 Example Config
@@ -53,6 +49,25 @@ Example Config
 
 Provide the source repo path for PLUMgrid Debs in 'install_sources' and the corresponding keys in 'install_keys'.
 The virtual IP passed on in the neutron-api charm has to be same as the one passed in the plumgrid-director charm.
+
+#Network Space support
+
+This charm supports the use of Juju Network Spaces, allowing the charm to be bound to network space configurations managed directly by Juju.  This is only supported with Juju 2.0 and above.
+
+To use this feature, use the --bind option when deploying the charm:
+
+    juju deploy plumgrid-edge --bind "internal=internal-space fabric=fabric-space"
+
+alternatively these can also be provided as part of a juju native bundle configuration:
+
+    plumgrid-edge:
+      charm: cs:plumgrid-edge
+      num_units: 1
+      bindings:
+        internal: internal-space
+        fabric: fabric-space
+
+NOTE: Spaces must be configured in the underlying provider prior to attempting to use them. 'internal' binding is mapped onto OpenStack internal-api endpoint while 'fabric' is mapped to OpenStack tenant-data-api endpoint.
 
 # Contact Information
 

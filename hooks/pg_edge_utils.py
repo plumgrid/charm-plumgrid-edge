@@ -17,6 +17,7 @@ from charmhelpers.core.hookenv import (
     log,
     config,
     unit_get,
+    network_get_primary_address,
     status_set
 )
 from charmhelpers.contrib.network.ip import (
@@ -57,6 +58,7 @@ AUTH_KEY_PATH = '%s/root/.ssh/authorized_keys' % PG_LXC_DATA_PATH
 SUDOERS_CONF = '/etc/sudoers.d/ifc_ctl_sudoers'
 FILTERS_CONF_DIR = '/etc/nova/rootwrap.d'
 FILTERS_CONF = '%s/network.filters' % FILTERS_CONF_DIR
+IFC_LIST_GW = '/var/run/plumgrid/ifc_list_gateway'
 
 BASE_RESOURCE_MAP = OrderedDict([
     (PG_CONF, {
@@ -152,6 +154,18 @@ def determine_packages():
                     % (tag, pkg)
                 raise ValueError(error_msg)
     return pkgs
+
+
+def get_unit_address(binding='internal'):
+    '''
+    Returns the unit's PLUMgrid Management/Fabric IP
+    '''
+    try:
+        # Using Juju 2.0 network spaces feature
+        return network_get_primary_address(binding)
+    except NotImplementedError:
+        # Falling back to private-address
+        return unit_get('private-address')
 
 
 def register_configs(release=None):
@@ -266,10 +280,15 @@ def get_mgmt_interface():
     mgmt_interface = config('mgmt-interface')
     if not mgmt_interface:
         try:
-            return get_iface_from_addr(unit_get('private-address'))
+            return get_iface_from_addr(get_unit_address('internal'))
         except:
+            # workaroud if get_unit_address returns hostname
+            # (issue with unit-get 'private-address') also
+            # workaround the curtin issue where the
+            # interface on which bridge is created also gets
+            # an ip
             for bridge_interface in get_bridges():
-                if (get_host_ip(unit_get('private-address'))
+                if (get_host_ip(get_unit_address())
                         in get_iface_addr(bridge_interface)):
                     return bridge_interface
     elif interface_exists(mgmt_interface):
@@ -277,7 +296,7 @@ def get_mgmt_interface():
     else:
         log('Provided managment interface %s does not exist'
             % mgmt_interface)
-        return get_iface_from_addr(unit_get('private-address'))
+        return get_iface_from_addr(get_unit_address())
 
 
 def fabric_interface_changed():
@@ -296,32 +315,49 @@ def fabric_interface_changed():
     return True
 
 
+def remove_ifc_list():
+    '''
+    Removes ifc_list_gateway file if fabric interface is changed
+    '''
+    _exec_cmd(cmd=['rm', '-f', IFC_LIST_GW])
+
+
 def get_fabric_interface():
     '''
     Returns the fabric interface.
     '''
     fabric_interfaces = config('fabric-interfaces')
-    if fabric_interfaces == 'MANAGEMENT':
-        return get_mgmt_interface()
+    if not fabric_interfaces:
+        try:
+            fabric_ip = get_unit_address('fabric')
+            mgmt_ip = get_unit_address('internal')
+        except:
+            raise ValueError('Unable to get interface using \'fabric\' \
+                              binding! Ensure fabric interface has IP \
+                              assigned.')
+        if fabric_ip == mgmt_ip:
+            return get_mgmt_interface()
+        else:
+            return get_iface_from_addr(fabric_ip)
     else:
         try:
             all_fabric_interfaces = json.loads(fabric_interfaces)
         except ValueError:
             raise ValueError('Invalid json provided for fabric interfaces')
-        hostname = get_unit_hostname()
-        if hostname in all_fabric_interfaces:
-            node_fabric_interface = all_fabric_interfaces[hostname]
-        elif 'DEFAULT' in all_fabric_interfaces:
-            node_fabric_interface = all_fabric_interfaces['DEFAULT']
-        else:
-            raise ValueError('No fabric interface provided for node')
-        if interface_exists(node_fabric_interface):
-            return node_fabric_interface
-        else:
-            log('Provided fabric interface %s does not exist'
-                % node_fabric_interface)
-            raise ValueError('Provided fabric interface does not exist')
+    hostname = get_unit_hostname()
+    if hostname in all_fabric_interfaces:
+        node_fabric_interface = all_fabric_interfaces[hostname]
+    elif 'DEFAULT' in all_fabric_interfaces:
+        node_fabric_interface = all_fabric_interfaces['DEFAULT']
+    else:
+        raise ValueError('No fabric interface provided for node')
+    if interface_exists(node_fabric_interface):
         return node_fabric_interface
+    else:
+        log('Provided fabric interface %s does not exist'
+            % node_fabric_interface)
+        raise ValueError('Provided fabric interface does not exist')
+    return node_fabric_interface
 
 
 def ensure_mtu():

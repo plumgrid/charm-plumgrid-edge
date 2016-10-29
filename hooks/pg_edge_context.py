@@ -4,7 +4,6 @@
 # PLUMgrid template files.
 
 from charmhelpers.contrib.openstack import context
-from charmhelpers.contrib.openstack.utils import get_host_ip
 from charmhelpers.core.hookenv import (
     relation_ids,
     related_units,
@@ -27,11 +26,10 @@ def _pg_dir_context():
     for rid in relation_ids('plumgrid'):
         for unit in related_units(rid):
             rdata = relation_get(rid=rid, unit=unit)
-            ctxt['director_ips'
-                 ].append(str(get_host_ip(rdata['private-address'])))
+            if 'dir_ip' in rdata:
+                ctxt['director_ips'].append(str(rdata['dir_ip']))
             if "opsvm_ip" in rdata:
-                ctxt['opsvm_ip'] = \
-                    rdata['opsvm_ip']
+                ctxt['opsvm_ip'] = rdata['opsvm_ip']
     return ctxt
 
 
