@@ -14,7 +14,7 @@ tags:
   - openstack
 extra-bindings:
   internal:
-  fabric:
+  compute-data:
 provides:
   neutron-plugin:
     interface: neutron-plugin

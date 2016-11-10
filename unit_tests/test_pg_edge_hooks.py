@@ -35,7 +35,8 @@ TO_PATCH = [
     'director_cluster_ready',
     'status_set',
     'configure_analyst_opsvm',
-    'remove_ifc_list'
+    'remove_ifc_list',
+    'get_unit_address'
 ]
 NEUTRON_CONF_DIR = "/etc/neutron"
 

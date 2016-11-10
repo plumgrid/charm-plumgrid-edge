@@ -165,7 +165,7 @@ def get_unit_address(binding='internal'):
         return network_get_primary_address(binding)
     except NotImplementedError:
         # Falling back to private-address
-        return unit_get('private-address')
+        return get_host_ip(unit_get('private-address'))
 
 
 def register_configs(release=None):
@@ -288,7 +288,7 @@ def get_mgmt_interface():
             # interface on which bridge is created also gets
             # an ip
             for bridge_interface in get_bridges():
-                if (get_host_ip(get_unit_address())
+                if (get_unit_address()
                         in get_iface_addr(bridge_interface)):
                     return bridge_interface
     elif interface_exists(mgmt_interface):
@@ -329,7 +329,7 @@ def get_fabric_interface():
     fabric_interfaces = config('fabric-interfaces')
     if not fabric_interfaces:
         try:
-            fabric_ip = get_unit_address('fabric')
+            fabric_ip = get_unit_address('compute-data')
             mgmt_ip = get_unit_address('internal')
         except:
             raise ValueError('Unable to get interface using \'fabric\' \
